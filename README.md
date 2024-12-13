@@ -185,18 +185,11 @@ And we will paste the direction of the newly created kernel and save it:
 kernel=C:\\Sources\\vmlinux
 ```
 
-Relaunch again the WSL terminal.
+Relaunch again the WSL terminal and check if the kernel has been successfully installed:
 
-Go back to the PowerShell terminal and redo the steps to attach the device:
+If you get a kernel with a "rt" in it, you have succesffuly updated your kernel. Example:
 ```
-usbipd wsl list
-usbipd wsl attach --busid <desired_bus_id> --distribution <name_of_your_WLS_distribution>
-```
-
-Go back to the WSL terminal and check if the device is propperly recognised by typing
-```
-lsusb
-ls /dev/video*
+Linux MY-COMPUTER 5.15.167.4-rt80-microsoft-standard-WSL2+ #1 SMP PREEMPT_RT Fri Dec 13 11:25:30 CET 2024 x86_64 x86_64 x86_64 GNU/Linux
 ```
 
-And we are done and all set to go!
+Congratulations!
