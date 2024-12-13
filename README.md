@@ -60,53 +60,50 @@ sudo apt-get install libncurses-dev flex bison openssl libssl-dev dkms libelf-de
 
 Now we create a direcotry to store all the files that we will download and install (if it doesn't exist already)
 ```
-sudo mkdir /usr/src
-cd /usr/src
+sudo mkdir ~/Downloads
+cd ~/Downloads
 ```
-
-Look for your kernel in here:
-[Index of /pub/linux/kernel/v5.x/](https://mirrors.edge.kernel.org/pub/linux/kernel/v5.x/)
-
-Download the kernel with the same name as yours:
-```sh
-wget https://mirrors.edge.kernel.org/pub/linux/kernel/v5.x/linux-<your_kernel_name>.tar.gz
-```
-
-Now we look for a real-time patch here:
-[Index of /pub/linux/kernel/projects/rt/]([https://mirrors.edge.kernel.org/pub/linux/kernel/v5.x/](https://cdn.kernel.org/pub/linux/kernel/projects/rt/5.15/older/))
+We look for a real-time patch here:
+[Index of /pub/linux/kernel/projects/rt/](https://cdn.kernel.org/pub/linux/kernel/projects/rt/5.15/older/)
 
 And we will aslo download it:
 ```sh
-wget https://cdn.kernel.org/pub/linux/kernel/projects/rt/5.15/older/patch-<your_kernel_name>.patch.gz
+sudo wget https://cdn.kernel.org/pub/linux/kernel/projects/rt/5.15/older/patch-<your_kernel_name>.patch.gz
 ```
 
-Now we will extract both:
-
-```sh
-tar -xzf linux-<your_kernel_name>.tar.gz
-```
-and:
+And extract it :
 ```sh
 gunzip patch-<your_kernel_name>.patch.gz
 ```
 
-Enter inside your linux folder:
+Look for your WSL kernel in here:
+[WSL2-Linux-Kernel - Releases](https://github.com/microsoft/WSL2-Linux-Kernel/releases)
+
+Download the kernel with the same name as yours:
 ```sh
-cd linux-<your_kernel_name>
+sudo git clone -b linux-msft-wsl-${VERSION} https://github.com/microsoft/WSL2-Linux-Kernel.git ${VERSION}-microsoft-standard
 ```
-And we will patch our kernel:
+
+Patch our kernel:
 ```sh
-patch -p1 < ../patch-<your_kernel_name>.patch
+sudo patch -p1 < ../patch-<your_kernel_name>.patch
+```
+
+Copy the original config:
+```sh
+sudo cp /proc/config.gz config.gz && \
+sudo gunzip config.gz && \
+sudo mv config .config
 ```
 
 Enable all Ubuntu configurations:
 ```sh
-yes '' | make oldconfig
+yes '' | sudo make oldconfig
 ```
 
 Enable expert mode:
 ```sh
-make nconfig
+sudo make nconfig
 ```
 
 A new window will open with the kernel configuration. Using the "arrow keys", and "enter" to navigate, and the "space" to select and unselect submodules, configure the following options:
@@ -118,7 +115,7 @@ General Setup --->
 Then we need to enable rt_preempt in the kernel:
 
 ```sh
-make menuconfig
+sudo make menuconfig
 ```
 
 A new window will open with the kernel configuration. Using the "arrow keys", and "enter" to navigate, and the "space" to select and unselect submodules, configure the following options:
@@ -154,9 +151,9 @@ A new window will open with the kernel configuration. Using the "arrow keys", an
 
 And we proceed to build the new kernel and copy it to replace the old one
 ```
-sudo make -j$(nproc) deb-pkg && \
-sudo make modules_install -j$(nproc) deb-pkg && \
-sudo make install -j$(nproc) deb-pkg && \
+sudo make -j$(nproc) && \
+sudo make modules_install -j$(nproc) && \
+sudo make install -j$(nproc) && \
 sudo mkdir /mnt/c/Sources/ && \
 sudo cp -rf vmlinux /mnt/c/Sources/
 ```
